@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\JsonResponse;
 use JsonSerializable;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class ResponseService
 {
@@ -16,7 +17,16 @@ class ResponseService
     {
         return response()->json(
             data: ['status' => 'ERR', 'message' => $e->getMessage()],
-            status: $e->getCode() ?: 400
+            status: self::getStatusCode($e)
         );
+    }
+
+    private static function getStatusCode(\Throwable $e): int
+    {
+        if ($e instanceof RouteNotFoundException) {
+            return 401;
+        }
+
+        return $e->getCode() ?: 400;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RefreshRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Interfaces\AuthServiceInterface;
 use Illuminate\Http\JsonResponse;
@@ -27,9 +29,26 @@ class AuthController extends Controller
         return $this->executeServiceAction($serviceAction);
     }
 
-    public function login(): JsonResponse
+    /**
+     * Login a user.
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $request): JsonResponse
     {
-        $serviceAction = fn() => throw new \Exception('Not implemented');
+        $serviceAction = fn() => $this->authService->login($request->validated());
+        return $this->executeServiceAction($serviceAction);
+    }
+
+    /**
+     * Refresh the token.
+     *
+     * @return JsonResponse
+     */
+    public function refresh(RefreshRequest $request): JsonResponse
+    {
+        $serviceAction = fn() => $this->authService->refresh($request->validated());
         return $this->executeServiceAction($serviceAction);
     }
 }
