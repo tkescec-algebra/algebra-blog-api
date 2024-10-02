@@ -15,7 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'auth.verify.token' => \App\Http\Middleware\VerifyAccessToken::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->dontReport([

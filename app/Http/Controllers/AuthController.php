@@ -51,4 +51,15 @@ class AuthController extends Controller
         $serviceAction = fn() => $this->authService->refresh($request->validated());
         return $this->executeServiceAction($serviceAction);
     }
+
+    /**
+     * Logout the user.
+     *
+     * @return JsonResponse
+     */
+    public function logout(): JsonResponse
+    {
+        $serviceAction = fn() => $this->authService->logout();
+        return $this->executeServiceAction($serviceAction);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\RegisterEvent;
 use App\Interfaces\AuthServiceInterface;
 use App\Models\Role;
 use App\Models\User;
@@ -19,6 +20,8 @@ class AuthService implements AuthServiceInterface
 
         $token = Auth::login($user);
 
+        RegisterEvent::dispatch($user);
+
         return $this->respondWithTokens($token, $user);
     }
 
@@ -35,15 +38,17 @@ class AuthService implements AuthServiceInterface
     {
         $refreshToken = $data['refresh_token'];
 
-        $newToken = JWTAuth::setToken($refreshToken)->refresh();
+        $newToken = JWTAuth::claims(['is_refresh_token' => false])->setToken($refreshToken)->refresh();
         $user = JWTAuth::authenticate($newToken);
 
         return $this->respondWithTokens($newToken, $user);
     }
 
-    public function logout(): void
+    public function logout(): array
     {
+        Auth::logout(true);
 
+        return ['message' => 'Successfully logged out'];
     }
 
     private function respondWithTokens(string $token, User $user): Enumerable
@@ -52,7 +57,7 @@ class AuthService implements AuthServiceInterface
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL(),
-            'refresh_token' => Auth::refresh(),
+            'refresh_token' => JWTAuth::claims(['is_refresh_token' => true])->fromUser($user),
         ]);
     }
 }

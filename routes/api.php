@@ -13,6 +13,12 @@ Route::get('/', function () {
     dd(new AuthServiceInterface());
 });
 
-Route::get('/test', function () {
-    return 'Hello World';
-})->middleware('auth:api');
+Route::group(['middleware' => ['auth:api','auth.verify.token']], function () {
+    Route::get('/test', function () {
+        return 'Hello World';
+    });
+
+    Route::get('logout', AuthController::class.'@logout');
+});
+
+
