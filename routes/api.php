@@ -10,7 +10,7 @@ Route::post('login', AuthController::class.'@login');
 Route::post('refresh', AuthController::class.'@refresh');
 
 Route::get('/', function () {
-    dd(new AuthServiceInterface());
+    return response()->json(['message' => 'Hello World!']);
 });
 
 Route::group(['middleware' => ['auth:api','auth.verify.token']], function () {
