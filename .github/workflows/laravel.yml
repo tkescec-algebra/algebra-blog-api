@@ -25,6 +25,25 @@ jobs:
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       run: php artisan test
 
-  # deploy:
-  #   name: Deploy to staging
-  #   needs: laravel-tests
+  deploy:
+    name: Deploy to staging
+    needs: laravel-tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Add serve known_hosts
+      run: |
+        ssh-keyscan 134.122.73.17 >> ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
+
+    - name: Deploy to staging
+      run: |
+        ssh root@134.122.73.17 "cd /var/www/algebra-blog-api/ && git pull origin dev && composer install --optimize-autoloader && php artisan migrate --force"
