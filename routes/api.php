@@ -21,4 +21,6 @@ Route::group(['middleware' => ['auth:api','auth.verify.token']], function () {
     Route::get('logout', AuthController::class.'@logout');
 });
 
-
+Route::get('/test-cicd', function () {
+    return response()->json(['message' => 'Testing CI/CD!']);
+});
